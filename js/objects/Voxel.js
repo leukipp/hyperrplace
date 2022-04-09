@@ -12,11 +12,6 @@ class Voxel {
         this.position = position;
         this.color = color;
 
-        this.material = new THREE.MeshPhongMaterial({
-            vertexColors: true,
-            shininess: 0.9
-        });
-
         this.init = new Promise(async function (resolve) {
             await this.addCube();
             await this.update();
@@ -26,12 +21,9 @@ class Voxel {
     }
 
     async addCube() {
-        this.geometry = new THREE.BoxGeometry(1, 1, 1);
-        this.cube = new THREE.Mesh(this.geometry, this.material.clone());
-
-        // add to scene
-        // this.scene.add(this.cube);
-        // setLayer(this.cube, this.stage.layer.voxels);
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshPhongMaterial({ vertexColors: true });
+        this.cube = new THREE.Mesh(geometry, material);
     }
 
     async update() {

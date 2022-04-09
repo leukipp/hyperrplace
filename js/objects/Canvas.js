@@ -11,11 +11,6 @@ class Canvas {
         this.height = height;
         this.color = color;
 
-        this.material = new THREE.MeshLambertMaterial({
-            color: this.color,
-            side: THREE.DoubleSide
-        });
-
         this.data = new DataLoader(this);
         this.frame = this.config.frame;
 
@@ -53,7 +48,8 @@ class Canvas {
 
     async addPlane() {
         const geometry = new THREE.PlaneGeometry(this.width, this.height);
-        this.plane = new THREE.Mesh(geometry, this.material);
+        const material = new THREE.MeshLambertMaterial({ color: this.color, side: THREE.DoubleSide });
+        this.plane = new THREE.Mesh(geometry, material);
 
         // add to scene
         this.scene.add(this.plane);
@@ -61,9 +57,9 @@ class Canvas {
     }
 
     async addVoxels(voxels) {
-        const material = new THREE.MeshPhongMaterial({ vertexColors: true });
-        const geometries = voxels.map((voxel) => voxel.geometry);
+        const geometries = voxels.map((voxel) => voxel.cube.geometry);
         const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+        const material = new THREE.MeshPhongMaterial({ vertexColors: true });
         this.voxels = new THREE.Mesh(geometry, material);
 
         // add to scene
@@ -79,33 +75,50 @@ class Canvas {
             return;
         }
 
+        // TODO: remove debug
+
         log("fetch start");
 
         const pixels = await this.data.getPixels(idx - 1e+6, idx + 1e+6);
 
         log("push start");
 
-        const voxels = [];
+        await this.clear();
+
+        const promises = [];
+        const positions = {};
+
         for (let i = 0; i < pixels.length; i++) {
             const [x1, y1, x2, y2, c] = pixels[i];
-            const position = new THREE.Vector3(x1, y1, 0);
+
+            const key = `${x1}-${y1}`;
+            positions[key] = (positions[key] || 0) + 1;
+            const z = positions[key] - 1;
+
+            const position = new THREE.Vector3(x1, y1, z);
             const color = this.colorMap[c];
 
-            // TODO: proper voxel index
             const voxel = new Voxel(this, i, position, color);
-            await voxel.init;
-            voxels.push(voxel);
+            promises.push(voxel.init);
 
             if (i > 100000) {
                 break
             }
-        }
+        };
 
         log("push end");
+
+        const voxels = await Promise.all(promises);
+
+        log("init end");
 
         this.addVoxels(voxels);
 
         log("draw end");
+    }
+
+    async clear() {
+        this.scene.remove(this.voxels);
     }
 
     async update() {

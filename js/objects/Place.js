@@ -25,9 +25,11 @@ class Place {
 
     async update() {
         const frame = this.config.frame;
-        this.canvas.forEach((canvas) => {
-            canvas.setFrame(frame);
-            canvas.update();
+
+        // update canvas frame
+        this.canvas.forEach(async (canvas) => {
+            await canvas.setFrame(frame);
+            await canvas.update();
         });
     }
 
