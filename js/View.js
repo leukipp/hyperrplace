@@ -30,16 +30,13 @@ class View {
         this.gui = new lil.GUI({ autoPlace: false, width: 320 });
         root.append(this.gui.domElement);
 
-        // config folder
-        const configFolder = this.gui.addFolder('Config').open();
-        configFolder.add(this.config, 'preset', this.presets).onChange((preset) => {
+        // data folder
+        const dataFolder = this.gui.addFolder('Data').open();
+        dataFolder.add(this.config, 'preset', this.presets).onChange((preset) => {
             setHash('preset', preset);
             window.location.reload();
         }).listen();
-        configFolder.add(this.config, 'frame', this.config._data.timestamps.min, this.config._data.timestamps.max, 1).onChange((v) => {
-            this.place.update();
-        }).listen();
-        configFolder.add(this.config, 'fps', 1, 120, 1).onChange((v) => {
+        dataFolder.add(this.config, 'frame', this.config._data.timestamps.min, this.config._data.timestamps.max, 1).onChange((v) => {
             this.place.update();
         }).listen();
 
@@ -57,9 +54,6 @@ class View {
         }).listen();
 
         // stage actions
-        this.gui.add(this.config, 'rotation', 0.0, 20.0, 0.01).onChange((v) => {
-            this.stage.update();
-        }).listen();
         this.gui.add(this, 'export');
         this.gui.add(this, 'reset');
     }

@@ -7,16 +7,13 @@ class Stage {
         this.name = document.title;
         this.layer = {
             canvas: 1,
-            voxels: 2,
-            boomOn: 3,
-            boomOff: 4
+            voxels: 2
         };
         this.scene = new THREE.Scene();
 
-        this.fps = [Math.max(30, this.config.fps)];
-
         this.clock = new THREE.Clock();
         this.delta = 0;
+        this.fps = 30;
 
         this.init = new Promise(async function (resolve) {
 
@@ -39,8 +36,6 @@ class Stage {
 
             // orbiter controls
             this.controls = new THREE.MapControls(this.camera, this.renderer.domElement);
-            this.controls.autoRotateSpeed = -this.config.rotation;
-            this.controls.autoRotate = !!this.config.rotation;
             this.controls.minDistance = 0.1;
             this.controls.maxDistance = this.config._canvas.size.height * 2;
             this.controls.screenSpacePanning = true;
@@ -91,23 +86,14 @@ class Stage {
         this.delta += this.clock.getDelta();
 
         // desired fps and delta
-        const fps = Math.max(30, this.config.fps);
-        const delta = 1 / fps;
+        const delta = 1 / this.fps;
 
         // check clock delta
         if (this.delta >= delta) {
             await this.render();
 
-            // append current fps
-            this.fps.push(1 / this.delta);
-            this.fps = this.fps.slice(-30);
-
             // update clock delta
             this.delta = this.delta % delta;
-
-            // adjust rotation speed
-            this.controls.autoRotate = !!this.config.rotation;
-            this.controls.autoRotateSpeed = -this.config.rotation * (30 / truncatedMean(this.fps, 0.0));
         }
     }
 

@@ -12,10 +12,8 @@
         }
     },
     "frame": 1649015206,
-    "fps": 60,
     "color": {
         "canvas": "0xffffff",
         "background": "0x2f2a46"
-    },
-    "rotation": 0.0
+    }
 }
