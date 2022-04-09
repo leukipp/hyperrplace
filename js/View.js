@@ -6,11 +6,11 @@ class View {
 
         // init stage
         this.stage = new Stage(this);
-        this.stage.loaded.then(async () => {
+        this.stage.init.then(async () => {
 
             // init place
             this.place = new Place(this.stage, 0);
-            this.place.loaded.then(async () => {
+            this.place.init.then(async () => {
 
                 // init controls
                 await this.controls(this.root.querySelector('#controls'));
@@ -37,18 +37,18 @@ class View {
             window.location.reload();
         }).listen();
         configFolder.add(this.config, 'frame', this.config._data.timestamps.min, this.config._data.timestamps.max, 1).onChange((v) => {
-            this.stage.update();
+            this.place.update();
         }).listen();
         configFolder.add(this.config, 'fps', 1, 120, 1).onChange((v) => {
-            this.stage.update();
+            this.place.update();
         }).listen();
 
         // light folder
-        const lightFolder = this.gui.addFolder('Light');
+        const lightFolder = this.gui.addFolder('Light').open();
         lightFolder.add(this.config.light, 'ambient', 0.1, 100.0, 0.01).onChange((v) => {
             this.stage.update();
         }).listen();
-        lightFolder.add(this.config.light, 'cube', 0.1, 100.0, 0.01).onChange((v) => {
+        lightFolder.add(this.config.light, 'voxel', 0.1, 100.0, 0.01).onChange((v) => {
             this.stage.update();
         }).listen();
         lightFolder.add(this.config.light, 'glow').onChange((v) => {
@@ -56,7 +56,7 @@ class View {
         }).listen();
 
         // color folder
-        const colorFolder = this.gui.addFolder('Color');
+        const colorFolder = this.gui.addFolder('Color').open();
         colorFolder.addColor(this.config.color, 'canvas').onChange((v) => {
             this.place.canvas.forEach(canvas => {
                 canvas.color = v;
@@ -85,9 +85,8 @@ class View {
         const changed = await setConfig(this.config, hash);
 
         // check event type
-        const loadEvent = event.type === 'loaded';
         const hashEvent = event.type === 'hashchange';
-        const changeEvent = loadEvent || (hashEvent && changed);
+        const changeEvent = (hashEvent && changed);
         if (!changeEvent) {
             return;
         }

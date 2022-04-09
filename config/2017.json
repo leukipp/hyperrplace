@@ -1,8 +1,8 @@
 {
     "_data": {
         "timestamps": {
-            "min": 1490118934,
-            "max": 1491238736
+            "min": 1490118935,
+            "max": 1491238735
         }
     },
     "_canvas": {
@@ -15,7 +15,7 @@
     "fps": 60,
     "light": {
         "ambient": 50.0,
-        "cube": 12.0,
+        "voxel": 12.0,
         "glow": false
     },
     "color": {

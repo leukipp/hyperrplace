@@ -1,14 +1,15 @@
 class LoaderUtils {
-    constructor(place) {
-        this.root = place.root;
-        this.config = place.config;
-        this.view = place.view;
-        this.scene = place.scene;
-        this.stage = place.stage;
-        this.place = place;
+    constructor(canvas) {
+        this.root = canvas.root;
+        this.config = canvas.config;
+        this.view = canvas.view;
+        this.scene = canvas.scene;
+        this.stage = canvas.stage;
+        this.canvas = canvas;
 
         this.fetch = {
             zip: async (url) => {
+
                 // load zip from url
                 const binary = await JSZipUtils.getBinaryContent(url);
                 const zip = await JSZip.loadAsync(binary);
@@ -22,6 +23,7 @@ class LoaderUtils {
                 return files;
             },
             json: async (url) => {
+
                 // load json from url
                 return fetch(url).then((response) => response.json());
             }
@@ -31,14 +33,20 @@ class LoaderUtils {
     }
 
     async load(url) {
+
+        // use cached result
         if (url in this.cache) {
+            log('info', `serve ${url} from cache`);
             return this.cache[url];
         }
 
         return new Promise(async function (resolve) {
             const type = url.split('.').pop();
+
+            // fetch data per type and cache results
             const data = await this.fetch[type](url);
             this.cache[url] = data;
+
             resolve(data);
         }.bind(this));
     }

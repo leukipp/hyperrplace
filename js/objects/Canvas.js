@@ -3,7 +3,6 @@ class Canvas {
         this.root = place.root;
         this.config = place.config;
         this.view = place.view;
-        this.data = place.data;
         this.scene = place.scene;
         this.stage = place.stage;
         this.place = place;
@@ -17,14 +16,39 @@ class Canvas {
             side: THREE.DoubleSide
         });
 
-        this.cubes = [];
+        this.data = new DataUtils(this);
+        this.frame = this.config.frame;
 
-        this.loaded = new Promise(async function (resolve) {
+        this.init = new Promise(async function (resolve) {
+            await this.data.init;
+            await this.mapColors();
+            await this.mapTimes();
+
             await this.addPlane();
-            await this.addCubes();
             await this.update();
+
             resolve(this);
         }.bind(this));
+    }
+
+    async mapColors() {
+        const colors = await this.data.getColors();
+
+        // create color mapping (id to rgb color)
+        this.colorMap = {};
+        colors.forEach((color, i) => {
+            this.colorMap[i] = intColor(color);
+        });
+    }
+
+    async mapTimes() {
+        const times = await this.data.getTimes();
+
+        // create time mapping (timestamp to pixel index)
+        this.timeMap = {};
+        times.forEach((time) => {
+            this.timeMap[time[1]] = time[0];
+        });
     }
 
     async addPlane() {
@@ -36,35 +60,52 @@ class Canvas {
         setLayer(this.plane, this.stage.layer.canvas);
     }
 
-    async addCube(index, position, color) {
-        const cube = new Cube(this, index, position, color);
-        await cube.loaded;
-        this.cubes.push(cube);
+    async addVoxels(voxels) {
+        const material = new THREE.MeshPhongMaterial({ vertexColors: true });
+        const geometries = voxels.map((voxel) => voxel.geometry);
+        const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(geometries);
+        this.voxels = new THREE.Mesh(geometry, material);
+
+        // add to scene
+        this.scene.add(this.voxels);
+        setLayer(this.voxels, this.stage.layer.voxels);
     }
 
-    async addCubes() {
-        // TEST FULL DATA
-        log(await this.data.getColors());
-        log(await this.data.getTimes());
+    async setFrame(frame) {
+        const idx = this.timeMap[frame];
 
-        // TEST RANGED DATA
-        log(await this.data.getUsers(0, 100));
-        log(await this.data.getPixels(0, 100));
+        // TODO: handle non existing timestamps
+        if (getType(idx) !== 'number') {
+            return;
+        }
 
-        // TEST 1
-        const position1 = new THREE.Vector3(0, 0, 0);
-        const color1 = intColor({ r: 255, g: 2, b: 2 });
-        this.addCube(0, position1, color1);
+        log("fetch start");
 
-        // TEST 2
-        const position2 = new THREE.Vector3(500, 500, 0);
-        const color2 = intColor({ r: 9, g: 255, b: 2 });
-        this.addCube(1, position2, color2);
+        const pixels = await this.data.getPixels(idx - 1e+6, idx + 1e+6);
 
-        // TEST 3
-        const position3 = new THREE.Vector3(999, 999, 0);
-        const color3 = intColor({ r: 9, g: 2, b: 255 });
-        this.addCube(2, position3, color3);
+        log("push start");
+
+        const voxels = [];
+        for (let i = 0; i < pixels.length; i++) {
+            const [x1, y1, x2, y2, c] = pixels[i];
+            const position = new THREE.Vector3(x1, y1, 0);
+            const color = this.colorMap[c];
+
+            // TODO: proper voxel index
+            const voxel = new Voxel(this, i, position, color);
+            await voxel.init;
+            voxels.push(voxel);
+
+            if (i > 100000) {
+                break
+            }
+        }
+
+        log("push end");
+
+        this.addVoxels(voxels);
+
+        log("draw end");
     }
 
     async update() {

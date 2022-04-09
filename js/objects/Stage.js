@@ -7,7 +7,7 @@ class Stage {
         this.name = document.title;
         this.layer = {
             canvas: 1,
-            cubes: 2,
+            voxels: 2,
             boomOn: 3,
             boomOff: 4
         };
@@ -19,7 +19,7 @@ class Stage {
         this.clock = new THREE.Clock();
         this.delta = 0;
 
-        this.loaded = new Promise(async function (resolve) {
+        this.init = new Promise(async function (resolve) {
 
             // stage directional light
             this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
@@ -49,7 +49,7 @@ class Stage {
 
             // bloom pass for composer
             this.bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(this.root.clientWidth, this.root.clientHeight));
-            this.bloomPass.strength = this.config.light.cube;
+            this.bloomPass.strength = this.config.light.voxel;
             this.bloomPass.radius = 1;
 
             // bloom effect composer
@@ -123,7 +123,7 @@ class Stage {
         // set status
         let status = this.name;
         if (message) {
-            status = numeric ? `${message} (${percent}%)` : message;
+            status = numeric ? `${message} (${parseInt(percent, 10)}%)` : message;
         }
         document.title = status;
 
@@ -205,7 +205,7 @@ class Stage {
 
         // update light intensities
         this.glow = this.config.light.glow;
-        this.bloomPass.strength = this.config.light.cube;
+        this.bloomPass.strength = this.config.light.voxel;
         this.ambientLight.intensity = this.config.light.ambient / 10;
 
         // update renderer size

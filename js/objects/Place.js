@@ -8,24 +8,27 @@ class Place {
         this.index = index;
 
         this.canvas = [];
-        this.data = new DataUtils(this);
 
-        this.loaded = new Promise(async function (resolve) {
-            await this.data.loaded;
+        this.init = new Promise(async function (resolve) {
             await this.addCanvas();
             await this.update();
+
             resolve(this);
         }.bind(this));
     }
 
     async addCanvas() {
         const canvas = new Canvas(this, this.canvas.length, this.config._canvas.size.width, this.config._canvas.size.height, this.config.color.canvas);
-        await canvas.loaded;
+        await canvas.init;
         this.canvas.push(canvas);
     }
 
     async update() {
-        // TODO
+        const frame = this.config.frame;
+        this.canvas.forEach((canvas) => {
+            canvas.setFrame(frame);
+            canvas.update();
+        });
     }
 
     async export(zip) {

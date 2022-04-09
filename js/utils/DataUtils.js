@@ -1,18 +1,22 @@
 class DataUtils {
-    constructor(place) {
-        this.root = place.root;
-        this.config = place.config;
-        this.view = place.view;
-        this.scene = place.scene;
-        this.stage = place.stage;
-        this.place = place;
+    constructor(canvas) {
+        this.root = canvas.root;
+        this.config = canvas.config;
+        this.view = canvas.view;
+        this.scene = canvas.scene;
+        this.stage = canvas.stage;
+        this.canvas = canvas;
 
-        this.loader = new LoaderUtils(place);
+        this.loader = new LoaderUtils(canvas);
 
-        this.loaded = new Promise(async function (resolve) {
-            this.index = await this.loader.load('data/index.json');
+        this.init = new Promise(async function (resolve) {
+            await this.mapIndex();
             resolve(this);
         }.bind(this));
+    }
+
+    async mapIndex() {
+        this.index = await this.loader.load('data/index.json');
     }
 
     async appendData(data, files) {
@@ -25,26 +29,27 @@ class DataUtils {
     async getData(type, from, to) {
         let data = [];
 
-        const preset = this.config.preset;
-        const files = this.index[preset][type];
-
         // show loader
         this.stage.status(`Loading ${type}`, 0);
 
-        if (!from && !to) {
-            // fetch all files
-            for (let i = 0; i < files.length; i++) {
-                const path = `data/${preset}/${type}/${files[i]}`;
+        // filter files
+        let files = this.index[this.config.preset][type];
+        if (from || to) {
+            files = files.filter((file) => {
+                const number = parseInt(file.split('.')[1], 10);
+                return number >= (from || 0) && number <= (to || 1e+9);
+            });
+        }
 
-                // load data
-                data = await this.appendData(data, await this.loader.load(path));
+        // fetch files
+        for (let i = 0; i < files.length; i++) {
+            const path = `data/${this.config.preset}/${type}/${files[i]}`;
 
-                // update loader
-                this.stage.status(`Loading ${type}`, 100 * (i + 1) / files.length);
-            }
-        } else {
-            // TODO: fetch files for range
-            // log(files);
+            // load data
+            data = await this.appendData(data, await this.loader.load(path));
+
+            // update loader
+            this.stage.status(`Loading ${type}`, 100 * (i + 1) / files.length);
         }
 
         // hide loader
