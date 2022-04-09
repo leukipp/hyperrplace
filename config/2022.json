@@ -16,7 +16,7 @@
     "light": {
         "ambient": 50.0,
         "cube": 12.0,
-        "glow": true
+        "glow": false
     },
     "color": {
         "canvas": "0xffffff",

@@ -5,6 +5,7 @@ class Place {
         this.loader = stage.loader;
         this.scene = stage.scene;
         this.stage = stage;
+        
         this.index = index;
 
         this.canvas = [];
@@ -19,7 +20,7 @@ class Place {
     }
 
     async addCanvas() {
-        const canvas = new Canvas(this, 0, this.config._canvas.size.width, this.config._canvas.size.height, this.config.color.canvas);
+        const canvas = new Canvas(this, this.canvas.length + 1, this.config._canvas.size.width, this.config._canvas.size.height, this.config.color.canvas);
         await canvas.loaded;
         this.canvas.push(canvas);
     }

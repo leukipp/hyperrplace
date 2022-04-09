@@ -42,7 +42,7 @@ class Stage {
             });
 
             // renderer
-            this.renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true, preserveDrawingBuffer: true, antialias: true, alpha: true });
+            this.renderer = new THREE.WebGLRenderer({ logarithmicDepthBuffer: true, preserveDrawingBuffer: true, antialias: true });
             this.renderer.toneMapping = THREE.ReinhardToneMapping;
             this.renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -94,6 +94,7 @@ class Stage {
             this.controls.autoRotate = !!this.config.rotation;
             this.controls.minDistance = 0.1;
             this.controls.maxDistance = this.config._canvas.size.height * 2;
+            this.controls.screenSpacePanning = true;
             this.controls.enablePan = true;
 
             // user interface
@@ -262,9 +263,9 @@ class Stage {
     async reset() {
 
         // reset camera position
-        this.camera.setRotationFromEuler(new THREE.Euler(0.0, 0.0, 0.0));
-        this.camera.position.set(this.config._canvas.size.width, this.config._canvas.size.height, 0.0);
-        this.controls.target.set(0.0, 0.0, 0.0);
+        this.camera.setRotationFromEuler(new THREE.Euler(0, 0, 0));
+        this.camera.position.set(0, 0, this.config._canvas.size.width);
+        this.controls.target.set(0, 0, 0);
 
         // update camera
         await this.update();

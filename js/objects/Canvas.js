@@ -21,6 +21,7 @@ class Canvas {
 
         this.loaded = new Promise(async function (resolve) {
             await this.addPlane();
+            await this.addCubes();
             await this.update();
 
             resolve(this);
@@ -28,20 +29,35 @@ class Canvas {
     }
 
     async addPlane() {
-        const geometry = new THREE.PlaneGeometry();
-        geometry.rotateX(rad(90));
-
+        const geometry = new THREE.PlaneGeometry(this.width, this.height);
         this.plane = new THREE.Mesh(geometry, this.material);
-        this.plane.scale.set(this.width, 1, this.height);
 
         // add to scene
         this.scene.add(this.plane);
         setLayer(this.plane, this.stage.layer.canvas);
     }
 
-    async addCube(position, color) {
-        const cube = new Cube(this, position, color)
+    async addCube(index, position, color) {
+        const cube = new Cube(this, index, position, color);
+        await cube.loaded;
         this.cubes.push(cube);
+    }
+
+    async addCubes() {
+        // TEST 1
+        const position1 = new THREE.Vector3(0, 0, 0);
+        const color1 = intColor({ r: 255, g: 2, b: 2 });
+        this.addCube(0, position1, color1);
+
+        // TEST 2
+        const position2 = new THREE.Vector3(500, 500, 0);
+        const color2 = intColor({ r: 9, g: 255, b: 2 });
+        this.addCube(1, position2, color2);
+
+        // TEST 3
+        const position3 = new THREE.Vector3(999, 999, 0);
+        const color3 = intColor({ r: 9, g: 2, b: 255 });
+        this.addCube(2, position3, color3);
     }
 
     async update() {

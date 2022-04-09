@@ -5,6 +5,7 @@ class Cube {
         this.loader = canvas.loader;
         this.scene = canvas.scene;
         this.stage = canvas.stage;
+        this.place = canvas.place;
         this.canvas = canvas;
 
         this.index = index;
@@ -53,8 +54,18 @@ class Cube {
         this.box.material.color.setHex(this.color);
         this.box.material.emissive.setHex(this.color);
 
+        // shift coordinate system (canvas is centered at [0,0,0])
+        const width = this.canvas.width;
+        const height = this.canvas.height;
+        const offset = new THREE.Vector3(0.5 - width / 2, 0.5 - height / 2, 0.5 + 0.01)
+
+        // add offset and invert y axis (data origin is at top-left corner)
+        const position = this.position;
+        position.add(offset);
+        position.y = -position.y
+
         // update position
-        this.box.position.copy(this.position);
+        this.box.position.copy(position);
     }
 
     async export(zip) {
