@@ -16,7 +16,7 @@ class Canvas {
             side: THREE.DoubleSide
         });
 
-        this.data = new DataUtils(this);
+        this.data = new DataLoader(this);
         this.frame = this.config.frame;
 
         this.init = new Promise(async function (resolve) {

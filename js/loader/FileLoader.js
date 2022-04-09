@@ -1,4 +1,4 @@
-class LoaderUtils {
+class FileLoader {
     constructor(canvas) {
         this.root = canvas.root;
         this.config = canvas.config;

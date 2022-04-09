@@ -13,11 +13,6 @@
     },
     "frame": 1491059195,
     "fps": 60,
-    "light": {
-        "ambient": 50.0,
-        "voxel": 12.0,
-        "glow": false
-    },
     "color": {
         "canvas": "0xffffff",
         "background": "0x2f2a46"

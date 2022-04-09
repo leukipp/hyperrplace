@@ -30,8 +30,8 @@ class Voxel {
         this.cube = new THREE.Mesh(this.geometry, this.material.clone());
 
         // add to scene
-        //this.scene.add(this.cube);
-        //setLayer(this.cube, this.stage.layer.voxels);
+        // this.scene.add(this.cube);
+        // setLayer(this.cube, this.stage.layer.voxels);
     }
 
     async update() {

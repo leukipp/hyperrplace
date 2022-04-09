@@ -43,18 +43,6 @@ class View {
             this.place.update();
         }).listen();
 
-        // light folder
-        const lightFolder = this.gui.addFolder('Light').open();
-        lightFolder.add(this.config.light, 'ambient', 0.1, 100.0, 0.01).onChange((v) => {
-            this.stage.update();
-        }).listen();
-        lightFolder.add(this.config.light, 'voxel', 0.1, 100.0, 0.01).onChange((v) => {
-            this.stage.update();
-        }).listen();
-        lightFolder.add(this.config.light, 'glow').onChange((v) => {
-            // TODO
-        }).listen();
-
         // color folder
         const colorFolder = this.gui.addFolder('Color').open();
         colorFolder.addColor(this.config.color, 'canvas').onChange((v) => {

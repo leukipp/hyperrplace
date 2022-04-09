@@ -1,4 +1,4 @@
-class DataUtils {
+class DataLoader {
     constructor(canvas) {
         this.root = canvas.root;
         this.config = canvas.config;
@@ -7,7 +7,7 @@ class DataUtils {
         this.stage = canvas.stage;
         this.canvas = canvas;
 
-        this.loader = new LoaderUtils(canvas);
+        this.file = new FileLoader(canvas);
 
         this.init = new Promise(async function (resolve) {
             await this.mapIndex();
@@ -16,7 +16,7 @@ class DataUtils {
     }
 
     async mapIndex() {
-        this.index = await this.loader.load('data/index.json');
+        this.index = await this.file.load('data/index.json');
     }
 
     async appendData(data, files) {
@@ -46,7 +46,7 @@ class DataUtils {
             const path = `data/${this.config.preset}/${type}/${files[i]}`;
 
             // load data
-            data = await this.appendData(data, await this.loader.load(path));
+            data = await this.appendData(data, await this.file.load(path));
 
             // update loader
             this.stage.status(`Loading ${type}`, 100 * (i + 1) / files.length);
