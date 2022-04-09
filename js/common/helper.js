@@ -202,7 +202,7 @@ const clamp = (value, min, max) => {
 };
 
 const sleep = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise(async (resolve) => setTimeout(resolve, ms));
 };
 
 const log = (...args) => {

@@ -12,7 +12,6 @@ class Stage {
             boomOff: 4
         };
         this.scene = new THREE.Scene();
-        this.loader = new LoaderUtils();
 
         this.glow = this.config.light.glow;
         this.fps = [Math.max(30, this.config.fps)];
@@ -20,7 +19,6 @@ class Stage {
         this.clock = new THREE.Clock();
         this.delta = 0;
 
-        this.status('Loading', 0);
         this.loaded = new Promise(async function (resolve) {
 
             // stage directional light

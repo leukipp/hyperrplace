@@ -2,11 +2,11 @@ class Canvas {
     constructor(place, index, width, height, color) {
         this.root = place.root;
         this.config = place.config;
-        this.loader = place.loader;
+        this.view = place.view;
+        this.data = place.data;
         this.scene = place.scene;
         this.stage = place.stage;
         this.place = place;
-
         this.index = index;
         this.width = width;
         this.height = height;
@@ -23,7 +23,6 @@ class Canvas {
             await this.addPlane();
             await this.addCubes();
             await this.update();
-
             resolve(this);
         }.bind(this));
     }
@@ -44,6 +43,14 @@ class Canvas {
     }
 
     async addCubes() {
+        // TEST FULL DATA
+        log(await this.data.getColors());
+        log(await this.data.getTimes());
+
+        // TEST RANGED DATA
+        log(await this.data.getUsers(0, 100));
+        log(await this.data.getPixels(0, 100));
+
         // TEST 1
         const position1 = new THREE.Vector3(0, 0, 0);
         const color1 = intColor({ r: 255, g: 2, b: 2 });

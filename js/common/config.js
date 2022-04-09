@@ -3,7 +3,7 @@ const presets = [
     '2022'
 ];
 
-const getPreset = async (configs) => {
+const getPreset = async () => {
     // load preset from url
     const hash = getHash();
     if (hash.preset) {
@@ -11,11 +11,11 @@ const getPreset = async (configs) => {
     }
 
     // using default preset
-    return configs[0];
+    return presets[0];
 };
 
 const getConfig = async (preset) => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
         fetch(`config/${preset}.json`).then((response) => response.json()).then(async (config) => {
             // get config from hash
             const hash = getHash();
@@ -30,7 +30,7 @@ const getConfig = async (preset) => {
             resolve(config);
         }).catch(async () => {
             // resolve promise using default preset
-            return resolve(await getConfig(configs[0]));
+            return resolve(await getConfig(presets[0]));
         });
     });
 };

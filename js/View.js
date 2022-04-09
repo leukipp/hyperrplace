@@ -4,9 +4,6 @@ class View {
         this.config = config;
         this.presets = presets;
 
-        // init filesystem
-        this.fs = new FileSystemUtils('/home/data');
-
         // init stage
         this.stage = new Stage(this);
         this.stage.loaded.then(async () => {
@@ -141,7 +138,7 @@ class View {
 document.addEventListener('DOMContentLoaded', async () => {
 
     // load preset and config
-    const preset = await getPreset(presets);
+    const preset = await getPreset();
     const config = await getConfig(preset);
 
     // init view

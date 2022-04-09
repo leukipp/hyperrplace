@@ -2,12 +2,12 @@ class Cube {
     constructor(canvas, index, position, color) {
         this.root = canvas.root;
         this.config = canvas.config;
-        this.loader = canvas.loader;
+        this.view = canvas.view;
+        this.data = canvas.data;
         this.scene = canvas.scene;
         this.stage = canvas.stage;
         this.place = canvas.place;
         this.canvas = canvas;
-
         this.index = index;
         this.position = position;
         this.color = color;
@@ -21,7 +21,6 @@ class Cube {
         this.loaded = new Promise(async function (resolve) {
             await this.addBox();
             await this.update();
-
             resolve(this);
         }.bind(this));
     }
