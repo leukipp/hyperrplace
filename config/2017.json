@@ -1,0 +1,26 @@
+{
+    "_data": {
+        "timestamps": {
+            "min": 1490118934,
+            "max": 1491238736
+        }
+    },
+    "_canvas": {
+        "size": {
+            "width": 1000,
+            "height": 1000
+        }
+    },
+    "frame": 1491059195,
+    "fps": 60,
+    "light": {
+        "ambient": 50.0,
+        "cube": 12.0,
+        "glow": true
+    },
+    "color": {
+        "canvas": "0xffffff",
+        "background": "0x2f2a46"
+    },
+    "rotation": 0.0
+}
