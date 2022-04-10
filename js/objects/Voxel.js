@@ -1,70 +1,40 @@
 class Voxel {
-    constructor(canvas, index, position, color) {
-        this.root = canvas.root;
-        this.config = canvas.config;
-        this.view = canvas.view;
-        this.data = canvas.data;
-        this.scene = canvas.scene;
-        this.stage = canvas.stage;
-        this.place = canvas.place;
-        this.canvas = canvas;
+    constructor(config, index, position, color) {
+        this.config = config;
         this.index = index;
         this.position = position;
-        this.color = color;
+        this.color = rgbColor(color);
 
-        this.init = new Promise(async function (resolve) {
-            await this.addCube();
-            await this.update();
+        // init geometry
+        this.geometry = new THREE.BoxGeometry();
+        this.geometry.userData['index'] = this.index;
+        this.geometry.userData['position'] = cloneObject(this.position);
+        this.geometry.userData['color'] = cloneObject(this.color);
 
-            resolve(this);
-        }.bind(this));
-    }
-
-    async addCube() {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshPhongMaterial({ vertexColors: true });
-        this.cube = new THREE.Mesh(geometry, material);
-    }
-
-    async update() {
-        if (!this.cube) {
-            return;
-        }
-
-        // update color
+        // set color attribute
         const colors = [];
-        const color = rgbColor(this.color);
-        for (let i = 0; i < this.cube.geometry.attributes.position.count; i++) {
-            colors.push(color.r, color.g, color.b);
+        for (let i = 0; i < this.geometry.attributes.position.count; i++) {
+            colors.push(this.color.r, this.color.g, this.color.b);
         }
-        this.cube.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
         // shift coordinate system (canvas is centered at [0,0,0])
-        const width = this.canvas.width;
-        const height = this.canvas.height;
-        const offset = new THREE.Vector3(0.5 - width / 2, 0.5 - height / 2, 0.5 + 0.01)
+        const width = this.config._canvas.size.width;
+        const height = this.config._canvas.size.height;
+        const offset = new THREE.Vector3(0.5 - width / 2, 0.5 - height / 2, 0.5)
 
         // add offset and invert y axis (data origin is at top-left corner)
-        const position = this.position;
-        position.add(offset);
-        position.y = -position.y
+        this.position.add(offset);
+        this.position.y = -this.position.y
 
-        // update position
+        // set position attribute
         const rotation = new THREE.Euler(0, 0, 0);
         const scale = new THREE.Vector3(1, 1, 1);
         const quaternion = new THREE.Quaternion();
         quaternion.setFromEuler(rotation);
 
         const matrix = new THREE.Matrix4();
-        matrix.compose(position, quaternion, scale);
-        this.cube.geometry.applyMatrix4(matrix);
-    }
-
-    async export(zip) {
-        // TODO
-    }
-
-    async reset() {
-        // TODo
+        matrix.compose(this.position, quaternion, scale);
+        this.geometry.applyMatrix4(matrix);
     }
 }

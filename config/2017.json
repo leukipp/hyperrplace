@@ -1,17 +1,17 @@
 {
-    "_data": {
-        "timestamps": {
-            "min": 1490118935,
-            "max": 1491238735
-        }
-    },
     "_canvas": {
         "size": {
             "width": 1000,
             "height": 1000
         }
     },
-    "frame": 1491059195,
+    "_data": {
+        "timestamps": {
+            "min": 1490118935,
+            "max": 1491238735
+        }
+    },
+    "frame": 1490118935,
     "color": {
         "canvas": "0xffffff",
         "background": "0x2f2a46"

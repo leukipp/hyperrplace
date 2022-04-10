@@ -9,7 +9,7 @@ class View {
         this.stage.init.then(async () => {
 
             // init place
-            this.place = new Place(this.stage, 0);
+            this.place = new Place(this.stage);
             this.place.init.then(async () => {
 
                 // init controls
@@ -43,10 +43,8 @@ class View {
         // color folder
         const colorFolder = this.gui.addFolder('Color').open();
         colorFolder.addColor(this.config.color, 'canvas').onChange((v) => {
-            this.place.canvas.forEach(canvas => {
-                canvas.color = v;
-                canvas.update();
-            });
+            this.place.color = v;
+            this.place.update();
         }).listen();
         colorFolder.addColor(this.config.color, 'background').onChange((v) => {
             this.stage.renderer.setClearColor(v);

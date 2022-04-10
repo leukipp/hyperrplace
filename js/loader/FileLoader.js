@@ -1,17 +1,12 @@
 class FileLoader {
-    constructor(canvas) {
-        this.root = canvas.root;
-        this.config = canvas.config;
-        this.view = canvas.view;
-        this.scene = canvas.scene;
-        this.stage = canvas.stage;
-        this.canvas = canvas;
+    constructor(config) {
+        this.config = config
 
         this.fetch = {
             zip: async (url) => {
 
                 // load zip from url
-                const binary = await JSZipUtils.getBinaryContent(url);
+                const binary = await fetch(url).then((response) => response.blob());
                 const zip = await JSZip.loadAsync(binary);
 
                 // load json from zip
@@ -28,24 +23,35 @@ class FileLoader {
                 return fetch(url).then((response) => response.json());
             }
         };
-
         this.cache = {};
     }
 
     async load(url) {
+        const cache = await this.loadCache(url);
+        if (cache) {
+            return cache;
+        }
+        return this.loadRemote(url);
+    }
 
-        // use cached result
+    async loadCache(url) {
         if (url in this.cache) {
-            log('info', `serve ${url} from cache`);
+            log('debug', `serve ${url} from cache`);
+
+            // use cached results
             return this.cache[url];
         }
+        return;
+    }
 
+    async loadRemote(url) {
         return new Promise(async function (resolve) {
-            const type = url.split('.').pop();
+            log('debug', `serve ${url} from remote`);
 
             // fetch data per type and cache results
+            const type = url.split('.').pop();
             const data = await this.fetch[type](url);
-            this.cache[url] = data;
+            // this.cache[url] = data;
 
             resolve(data);
         }.bind(this));

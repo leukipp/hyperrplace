@@ -201,7 +201,8 @@
 
                 for (let j = 0; j < index.count; ++j) {
 
-                    mergedIndex.push(index.getX(j) + indexOffset);
+                    // CHANGED TO SUPPORT SERIALIZED OBJECTS
+                    mergedIndex.push(index.array[j * index.itemSize] + indexOffset);
 
                 }
 
