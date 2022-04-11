@@ -6,7 +6,7 @@ class Place {
         this.scene = stage.scene;
         this.stage = stage;
 
-        this.frame = -1;
+        this.time = -1;
         this.color = this.config.color.canvas;
         this.worker = new WorkerLoader(this.config, 'DataWorker');
 
@@ -22,16 +22,16 @@ class Place {
     }
 
     async animate() {
-        if (this.frame !== this.config.frame) {
-            const voxels = await this.worker.execute({ 'getVoxels': { arguments: [this.config.frame] } });
+        if (this.time !== this.config.time) {
+            const voxels = await this.worker.execute({ 'getVoxels': { arguments: [this.config.time] } });
             if (voxels[0]) {
 
                 // update voxels
                 await this.remVoxels();
                 await this.addVoxels(voxels);
 
-                // update current frame
-                this.frame = this.config.frame;
+                // update current time
+                this.time = this.config.time;
             }
         }
 

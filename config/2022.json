@@ -6,12 +6,13 @@
         }
     },
     "_data": {
-        "timestamps": {
+        "pixels": 160353105,
+        "times": {
             "min": 1648817050,
             "max": 1649117640
         }
     },
-    "frame": 1648817050,
+    "time": 1648817050,
     "color": {
         "canvas": "0xffffff",
         "background": "0x2f2a46"

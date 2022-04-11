@@ -116,11 +116,11 @@ class DataWorker {
         }
     }
 
-    async getVoxels(frame) {
+    async getVoxels(time) {
         let index = 0;
-        Object.keys(this.map.times).forEach((timestamp) => {
-            if (timestamp < frame) {
-                index = this.map.times[timestamp];
+        Object.keys(this.map.times).forEach((t) => {
+            if (t < time) {
+                index = this.map.times[t];
             }
         });
 

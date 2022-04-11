@@ -36,7 +36,7 @@ class View {
             setHash('preset', preset);
             window.location.reload();
         }).listen();
-        dataFolder.add(this.config, 'frame', this.config._data.timestamps.min, this.config._data.timestamps.max, 1).onChange((v) => {
+        dataFolder.add(this.config, 'time', this.config._data.times.min, this.config._data.times.max, 1).onChange((v) => {
             this.place.update();
         }).listen();
 
