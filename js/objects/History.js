@@ -7,6 +7,8 @@ class History {
         this.stage = place.stage;
         this.place = place;
 
+        this.size = this.config._canvas.width * this.config._canvas.height;
+
         this.init = new Promise(async function (resolve) {
             await this.addVoxels();
             await this.update();
@@ -65,15 +67,15 @@ class History {
             offset: new THREE.Vector3(0.5 - this.config._canvas.width / 2, 0.5 - this.config._canvas.height / 2, 0.5),
             color: Array.from(this.geometry.attributes.color.array),
             position: Array.from(this.geometry.attributes.position.array),
-            normal: Array.from(this.geometry.attributes.normal.array),
-            uv: Array.from(this.geometry.attributes.uv.array)
+            normal: Array.from(this.geometry.attributes.normal.array)
         };
 
         // init merged attributes
-        this.mergedAttributes = {};
-        for (const name in this.geometry.attributes) {
-            this.mergedAttributes[name] = [];
-        }
+        this.mergedAttributes = {
+            color: [],
+            position: [],
+            normal: []
+        };
 
         // init merged index
         this.mergedIndex = {
@@ -82,7 +84,7 @@ class History {
         };
 
         // generate merged voxel geometry
-        for (let i = 0, l = this.config._canvas.width * this.config._canvas.height; i < l; i++) {
+        for (let i = 0, l = this.size; i < l; i++) {
             const position = {
                 x: i % this.config._canvas.width,
                 y: (i - i % this.config._canvas.width) / this.config._canvas.width
@@ -92,7 +94,6 @@ class History {
             this.mergedAttributes.color.push(this.origins.color);
             this.mergedAttributes.position.push(this.getPositions(position));
             this.mergedAttributes.normal.push(this.origins.normal);
-            this.mergedAttributes.uv.push(this.origins.uv);
 
             // merge index
             for (let j = 0, l = this.geometry.index.count; j < l; j++) {
@@ -118,7 +119,6 @@ class History {
     async mergeAttributes(name) {
         const attributes = this.mergedAttributes[name];
         const array = new Float32Array(attributes[0].length * attributes.length);
-        const size = name === 'uv' ? 2 : 3;
 
         // merge geometry attributes
         let offset = 0;
@@ -132,7 +132,7 @@ class History {
             }
         }
 
-        return new THREE.BufferAttribute(array, size);
+        return new THREE.BufferAttribute(array, 3);
     }
 
     async update() {
