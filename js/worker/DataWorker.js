@@ -1,9 +1,8 @@
 importScripts(
+    '../common/helper.js',
     '../libraries/three.min.js',
     '../libraries/jszip.min.js',
-    '../common/helper.js',
-    '../loader/FileLoader.js',
-    '../utils/BufferGeometryUtils.js'
+    '../loader/FileLoader.js'
 );
 
 class DataWorker {

@@ -5,11 +5,11 @@ class View {
         this.presets = presets;
 
         // init stage
-        this.stage = new Stage(this);
+        this.stage = new StageObject(this);
         this.stage.init.then(async () => {
 
             // init place
-            this.place = new Place(this.stage);
+            this.place = new PlaceObject(this.stage);
             this.place.init.then(async () => {
 
                 // init controls

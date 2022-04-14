@@ -1,4 +1,4 @@
-class Stage {
+class StageObject {
     constructor(view) {
         this.root = view.root;
         this.config = view.config;

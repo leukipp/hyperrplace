@@ -1,4 +1,4 @@
-class Place {
+class PlaceObject {
     constructor(stage) {
         this.root = stage.root;
         this.config = stage.config;
@@ -7,7 +7,7 @@ class Place {
         this.stage = stage;
 
         this.worker = new WorkerLoader(this.config, 'DataWorker');
-        this.history = new History(this);
+        this.history = new HistoryObject(this);
         this.state = {
             time: -1,
             canvas: new Uint8Array(this.config._canvas.width * this.config._canvas.height)
