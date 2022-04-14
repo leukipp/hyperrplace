@@ -32,7 +32,7 @@ class PlaceObject {
             // update color 
             for (let i = 0, l = pixels.canvas.length; i < l; i++) {
                 if (pixels.canvas[i] !== this.state.canvas[i]) {
-                    const color = rgbColor(pixels.colors[pixels.canvas[i]]);
+                    const color = new THREE.Color(pixels.colors[pixels.canvas[i]]);
                     this.history.setColor(color, i);
                 }
             }

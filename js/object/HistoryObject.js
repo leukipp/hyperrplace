@@ -22,7 +22,7 @@ class HistoryObject {
         // generate colors
         const colors = [];
         for (let i = 0, l = 24 * 3; i < l; i += 3) {
-            colors.push(color.r / 255, color.g / 255, color.b / 255);
+            colors.push(color.r, color.g, color.b);
         }
 
         return colors;
@@ -55,14 +55,11 @@ class HistoryObject {
 
     async addVoxels() {
 
-        //return this.test();
-
         // merged geometry
         this.mergedGeometry = new THREE.BufferGeometry();
 
         // single geometry
-        this.geometry = new VoxelGeometry(1, 1, 1);
-        this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.getColors(rgbColor(this.config.color.canvas)), 3));
+        this.geometry = new VoxelGeometry(this.config.color.canvas);
 
         // init origins
         this.origins = {
@@ -116,47 +113,6 @@ class HistoryObject {
 
         // set merged index
         this.mergedGeometry.setIndex(this.mergedIndex.index);
-    }
-
-    test() {
-        console.time();
-
-        const cellSize = 1000;
-        const world = new VoxelWorld(cellSize, 50, cellSize);
-
-        for (let y = 0; y < world.cellSizeY; ++y) {
-            for (let z = 0; z < world.cellSizeZ; ++z) {
-                for (let x = 0; x < world.cellSizeX; ++x) {
-                    world.setVoxel(x, y, z, 1);
-                }
-            }
-        }
-
-        console.timeEnd();
-
-        console.time();
-        const { positions, normals, indices } = world.generateGeometryDataForCell(0, 0, 0);
-        console.timeEnd();
-
-        console.time();
-
-        const geometry = new THREE.BufferGeometry();
-        const material = new THREE.MeshLambertMaterial({ color: 'green' });
-
-        const positionNumComponents = 3;
-        const normalNumComponents = 3;
-        geometry.setAttribute(
-            'position',
-            new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
-        geometry.setAttribute(
-            'normal',
-            new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
-        geometry.setIndex(indices);
-
-        const mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(mesh);
-
-        console.timeEnd();
     }
 
     async mergeAttributes(name) {
