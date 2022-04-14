@@ -1,12 +1,11 @@
 {
     "_canvas": {
-        "size": {
-            "width": 1000,
-            "height": 1000
-        }
+        "width": 1000,
+        "height": 1000
     },
     "_data": {
-        "pixels": 16556641,
+        "colors": 16,
+        "pixels": 16567567,
         "times": {
             "min": 1490118935,
             "max": 1491238735

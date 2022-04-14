@@ -2,7 +2,6 @@ importScripts(
     '../libraries/three.min.js',
     '../libraries/jszip.min.js',
     '../common/helper.js',
-    '../objects/Voxel.js',
     '../loader/FileLoader.js',
     '../utils/BufferGeometryUtils.js'
 );
@@ -14,9 +13,19 @@ class DataWorker {
         this.root = '../../data';
         this.loader = new FileLoader(this.config);
 
+        this.map = {
+            colors: new Uint32Array(this.config._data.colors),
+            times: new Uint32Array(this.config._data.times.max - this.config._data.times.min + 1),
+            pixels: {
+                x: new Uint16Array(this.config._data.pixels),
+                y: new Uint16Array(this.config._data.pixels),
+                c: new Uint8Array(this.config._data.pixels)
+            }
+        };
+        this.canvas = new Uint8Array(this.config._canvas.width * this.config._canvas.height);
+
         this.init = new Promise(async function (resolve) {
             this.index = await this.loader.load(`${this.root}/index.json`);
-            this.map = { colors: {}, times: {}, pixels: {} };
 
             await this.mapColors();
             await this.mapTimes();
@@ -51,7 +60,7 @@ class DataWorker {
         }
 
         // fetch files and merge results
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0, l = files.length; i < l; i++) {
             const path = `${this.root}/${this.config.preset}/${type}/${files[i]}`;
             data = await this.appendData(data, await this.loader.load(path));
         }
@@ -73,8 +82,18 @@ class DataWorker {
 
         // create time mapping (timestamp to pixel index)
         times.forEach((time) => {
-            this.map.times[time[1]] = time[0];
+            const [index, timestamp] = time;
+            if (timestamp >= this.config._data.times.min && timestamp <= this.config._data.times.max) {
+                this.map.times[timestamp - this.config._data.times.min] = index;
+            }
         });
+
+        // forward fill unmapped timestamps
+        for (let i = 1, l = this.map.times.length; i <= l; i++) {
+            if (!this.map.times[i]) {
+                this.map.times[i] = this.map.times[i - 1];
+            }
+        }
     }
 
     async mapPixels() {
@@ -88,14 +107,14 @@ class DataWorker {
         });
 
         // how many of these batches should be fetched in parallel
-        const downloadChunks = 2;
+        const downloadChunks = 3;
         const downloadBatches = zipBatches.chunk(downloadChunks);
 
         // add first zip as single batch for faster data preview
         downloadBatches.unshift([[0, 0]]);
 
         // download zip as batches with multiple in parallel
-        for (let i = 0; i < downloadBatches.length; i++) {
+        for (let i = 0, l = downloadBatches.length; i < l; i++) {
             const parallel = downloadBatches[i].map((fromTo) => this.getData('pixels', ...fromTo));
             const dates = await Promise.all(parallel);
 
@@ -105,49 +124,31 @@ class DataWorker {
                 // extract pixel data (TODO: x2, y2 rect support)
                 data.forEach((pixel, index) => {
                     const [x1, y1, x2, y2, c] = pixel;
-                    const position = new THREE.Vector3(x1, y1, 0);
-                    const color = this.map.colors[c];
-
-                    // generate voxel geometry
-                    const voxel = new Voxel(this.config, startIndex + index, position, color);
-                    this.map.pixels[voxel.index] = voxel.geometry;
+                    this.map.pixels.x[startIndex + index] = x1;
+                    this.map.pixels.y[startIndex + index] = y1;
+                    this.map.pixels.c[startIndex + index] = c;
                 });
             });
         }
     }
 
-    async getVoxels(time) {
-        let index = 0;
-        Object.keys(this.map.times).forEach((t) => {
-            if (t < time) {
-                index = this.map.times[t];
-            }
-        });
+    async getPixels(time) {
+        const index = this.map.times[time - this.config._data.times.min];
 
-        if (getType(index) === 'number') {
-
-            // filter geometries by index
-            const geometries = {};
-            for (const i in this.map.pixels) {
-                const geometry = this.map.pixels[i];
-                const position = geometry.userData.position;
-
-                // overwriting dictionary over same positions
-                if (i < index) {
-                    const key = `${position.x}-${position.y}`;
-                    geometries[key] = geometry;
-                }
-            }
-
-            // send to main thread
-            if (Object.keys(geometries).length) {
-                self.postMessage({ getVoxels: THREE.BufferGeometryUtils.mergeBufferGeometries(Object.values(geometries)) });
-                return;
-            }
+        // update canvas
+        for (let i = 0; i <= index; i++) {
+            const x = this.map.pixels.x[i];
+            const y = this.map.pixels.y[i];
+            const c = this.map.pixels.c[i];
+            this.canvas[x + this.config._canvas.width * y] = c;
         }
 
-        // send to main thread
-        self.postMessage({ getVoxels: null });
+        self.postMessage({
+            getPixels: {
+                canvas: this.canvas,
+                colors: this.map.colors
+            }
+        });
     }
 }
 

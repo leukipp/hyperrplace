@@ -9,9 +9,11 @@ class Place {
         this.time = -1;
         this.color = this.config.color.canvas;
         this.worker = new WorkerLoader(this.config, 'DataWorker');
+        this.history = new History(this);
 
         this.init = new Promise(async function (resolve) {
             await this.addCanvas();
+            await this.addVoxels();
             await this.update();
 
             this.animate = this.animate.bind(this);
@@ -23,25 +25,29 @@ class Place {
 
     async animate() {
         if (this.time !== this.config.time) {
-            const voxels = await this.worker.execute({ 'getVoxels': { arguments: [this.config.time] } });
-            if (voxels[0]) {
+            const pixels = (await this.worker.execute({ 'getPixels': { arguments: [this.config.time] } }))[0];
 
-                // update voxels
-                await this.remVoxels();
-                await this.addVoxels(voxels);
+            console.time();
 
-                // update current time
-                this.time = this.config.time;
+            for (let i = 0, l = pixels.canvas.length; i < l; i++) {
+                const color = rgbColor(pixels.colors[pixels.canvas[i]]);
+
+                // set color attribute
+                this.history.setColor(color, i);
             }
+
+            this.history.update();
+
+            console.timeEnd();
         }
 
         // request frame
-        await sleep(100);
+        await sleep(5000);
         requestAnimationFrame(this.animate);
     }
 
     async addCanvas() {
-        const geometry = new THREE.PlaneGeometry(this.config._canvas.size.width, this.config._canvas.size.height);
+        const geometry = new THREE.PlaneGeometry(this.config._canvas.width, this.config._canvas.height);
         const material = new THREE.MeshLambertMaterial({ color: this.color, side: THREE.DoubleSide });
         this.canvas = new THREE.Mesh(geometry, material);
 
@@ -50,23 +56,14 @@ class Place {
         setLayer(this.canvas, this.stage.layer.canvas);
     }
 
-    async addVoxels(voxels) {
-        const geometry = THREE.BufferGeometryUtils.mergeBufferGeometries(voxels);
+    async addVoxels() {
+        await this.history.init;
         const material = new THREE.MeshPhongMaterial({ vertexColors: true });
-        this.voxels = new THREE.Mesh(geometry, material);
+        this.voxels = new THREE.Mesh(this.history.mergedGeometry, material);
 
         // add to scene
         this.scene.add(this.voxels);
         setLayer(this.voxels, this.stage.layer.voxels);
-    }
-
-    async remVoxels() {
-        if (!this.voxels) {
-            return;
-        }
-
-        // remove voxels
-        this.scene.remove(this.voxels);
     }
 
     async update() {

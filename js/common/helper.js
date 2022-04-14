@@ -162,7 +162,7 @@ const log = (...args) => {
 };
 
 Array.prototype.chunk = function (size) {
-    let result = [];
+    const result = [];
     while (this.length) {
         result.push(this.splice(0, size));
     }

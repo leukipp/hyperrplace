@@ -13,7 +13,7 @@ class Stage {
 
         this.clock = new THREE.Clock();
         this.delta = 0;
-        this.fps = 60;
+        this.fps = 30;
 
         this.init = new Promise(async function (resolve) {
 
@@ -37,7 +37,7 @@ class Stage {
             // orbiter controls
             this.controls = new THREE.MapControls(this.camera, this.renderer.domElement);
             this.controls.minDistance = 0.1;
-            this.controls.maxDistance = this.config._canvas.size.height * 5;
+            this.controls.maxDistance = this.config._canvas.height * 5;
             this.controls.screenSpacePanning = true;
             this.controls.enablePan = true;
 
@@ -166,7 +166,7 @@ class Stage {
 
         // reset camera position
         this.camera.setRotationFromEuler(new THREE.Euler(0, 0, 0));
-        this.camera.position.set(0, 0, this.config._canvas.size.width);
+        this.camera.position.set(0, 0, this.config._canvas.width);
         this.controls.target.set(0, 0, 0);
 
         // update camera

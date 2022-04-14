@@ -5,7 +5,7 @@ class WorkerLoader {
 
         this.current = 0;
         this.workers = [];
-        for (let i = 0; i < navigator.hardwareConcurrency; i++) {
+        for (let i = 0, l = navigator.hardwareConcurrency; i < l; i++) {
             this.workers.push(new Worker(`js/worker/${this.worker}.js`));
         }
     }
