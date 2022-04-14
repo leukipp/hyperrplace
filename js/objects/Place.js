@@ -6,10 +6,12 @@ class Place {
         this.scene = stage.scene;
         this.stage = stage;
 
-        this.time = -1;
-        this.color = this.config.color.canvas;
         this.worker = new WorkerLoader(this.config, 'DataWorker');
         this.history = new History(this);
+        this.state = {
+            time: -1,
+            canvas: new Uint8Array(this.config._canvas.width * this.config._canvas.height)
+        };
 
         this.init = new Promise(async function (resolve) {
             await this.addCanvas();
@@ -24,31 +26,32 @@ class Place {
     }
 
     async animate() {
-        if (this.time !== this.config.time) {
+        if (this.state.time !== this.config.time) {
             const pixels = (await this.worker.execute({ 'getPixels': { arguments: [this.config.time] } }))[0];
 
-            console.time();
-
+            // update color 
             for (let i = 0, l = pixels.canvas.length; i < l; i++) {
-                const color = rgbColor(pixels.colors[pixels.canvas[i]]);
-
-                // set color attribute
-                this.history.setColor(color, i);
+                if (pixels.canvas[i] !== this.state.canvas[i]) {
+                    const color = rgbColor(pixels.colors[pixels.canvas[i]]);
+                    this.history.setColor(color, i);
+                }
             }
 
-            this.history.update();
+            // update geometry
+            await this.history.update();
 
-            console.timeEnd();
+            // save current state
+            this.state.time = pixels.time;
+            this.state.canvas = pixels.canvas;
         }
 
         // request frame
-        await sleep(5000);
         requestAnimationFrame(this.animate);
     }
 
     async addCanvas() {
         const geometry = new THREE.PlaneGeometry(this.config._canvas.width, this.config._canvas.height);
-        const material = new THREE.MeshLambertMaterial({ color: this.color, side: THREE.DoubleSide });
+        const material = new THREE.MeshLambertMaterial({ color: this.config.color.canvas, side: THREE.DoubleSide });
         this.canvas = new THREE.Mesh(geometry, material);
 
         // add to scene
@@ -72,7 +75,7 @@ class Place {
         }
 
         // update canvas color
-        this.canvas.material.color.setHex(this.color);
+        this.canvas.material.color.setHex(this.config.color.canvas);
     }
 
     async export(zip) {

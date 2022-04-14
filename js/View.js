@@ -43,7 +43,6 @@ class View {
         // color folder
         const colorFolder = this.gui.addFolder('Color').open();
         colorFolder.addColor(this.config.color, 'canvas').onChange((v) => {
-            this.place.color = v;
             this.place.update();
         }).listen();
         colorFolder.addColor(this.config.color, 'background').onChange((v) => {

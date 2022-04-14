@@ -15,20 +15,6 @@ class History {
         }.bind(this));
     }
 
-    mergeAttributes(name) {
-        const attributes = this.mergedAttributes[name];
-        const array = new Float32Array(attributes[0].length * attributes.length);
-        const size = name === 'uv' ? 2 : 3;
-
-        let offset = 0;
-        for (let i = 0, l = attributes.length; i < l; ++i) {
-            array.set(attributes[i], offset);
-            offset += attributes[i].length;
-        }
-
-        return new THREE.BufferAttribute(array, size);
-    }
-
     getColors(color) {
 
         // generate colors
@@ -66,7 +52,6 @@ class History {
     }
 
     async addVoxels() {
-        console.time();
 
         // merged geometry
         this.mergedGeometry = new THREE.BufferGeometry();
@@ -115,27 +100,46 @@ class History {
             }
             this.mergedIndex.offset += this.geometry.attributes.position.count;
 
-            if (i >= 9) {
-                //break;
+            // release thread
+            if (i % 100000 == 0) {
+                await sleep();
             }
         }
 
         // set attributes
         for (const name in this.mergedAttributes) {
-            this.mergedGeometry.setAttribute(name, this.mergeAttributes(name));
+            this.mergedGeometry.setAttribute(name, await this.mergeAttributes(name));
         }
 
         // set merged index
         this.mergedGeometry.setIndex(this.mergedIndex.index);
+    }
 
-        console.timeEnd();
+    async mergeAttributes(name) {
+        const attributes = this.mergedAttributes[name];
+        const array = new Float32Array(attributes[0].length * attributes.length);
+        const size = name === 'uv' ? 2 : 3;
+
+        // merge geometry attributes
+        let offset = 0;
+        for (let i = 0, l = attributes.length; i < l; ++i) {
+            array.set(attributes[i], offset);
+            offset += attributes[i].length;
+
+            // release thread
+            if (i % 100000 == 0) {
+                await sleep();
+            }
+        }
+
+        return new THREE.BufferAttribute(array, size);
     }
 
     async update() {
 
         // update attributes
-        this.mergedGeometry.setAttribute('color', this.mergeAttributes('color'));
-        this.mergedGeometry.setAttribute('position', this.mergeAttributes('position'));
+        this.mergedGeometry.setAttribute('color', await this.mergeAttributes('color'));
+        //this.mergedGeometry.setAttribute('position', this.mergeAttributes('position'));
     }
 
     async export(zip) {

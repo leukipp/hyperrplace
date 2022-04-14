@@ -135,6 +135,9 @@ class DataWorker {
     async getPixels(time) {
         const index = this.map.times[time - this.config._data.times.min];
 
+        // reset canvas
+        this.canvas.fill(this.map.colors.indexOf(0xffffff));
+
         // update canvas
         for (let i = 0; i <= index; i++) {
             const x = this.map.pixels.x[i];
@@ -143,8 +146,10 @@ class DataWorker {
             this.canvas[x + this.config._canvas.width * y] = c;
         }
 
+        // post message
         self.postMessage({
             getPixels: {
+                time: time,
                 canvas: this.canvas,
                 colors: this.map.colors
             }
