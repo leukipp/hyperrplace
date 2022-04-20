@@ -59,7 +59,7 @@ class HistoryObject {
         this.mergedGeometry = new THREE.BufferGeometry();
 
         // single geometry
-        this.geometry = new VoxelGeometry(this.config.color.canvas);
+        this.geometry = new VoxelGeometry(this.config._color.canvas);
 
         // init origins
         this.origins = {

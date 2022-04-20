@@ -51,7 +51,7 @@ class PlaceObject {
 
     async addCanvas() {
         const geometry = new THREE.PlaneGeometry(this.config._canvas.width, this.config._canvas.height);
-        const material = new THREE.MeshLambertMaterial({ color: this.config.color.canvas, side: THREE.DoubleSide });
+        const material = new THREE.MeshLambertMaterial({ color: this.config._color.canvas, side: THREE.DoubleSide });
         this.canvas = new THREE.Mesh(geometry, material);
 
         // add to scene
@@ -75,7 +75,7 @@ class PlaceObject {
         }
 
         // update canvas color
-        this.canvas.material.color.setHex(this.config.color.canvas);
+        this.canvas.material.color.setHex(this.config._color.canvas);
     }
 
     async export(zip) {

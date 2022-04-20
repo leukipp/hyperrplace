@@ -30,27 +30,16 @@ class View {
         this.gui = new lil.GUI({ autoPlace: false, width: 320 });
         root.append(this.gui.domElement);
 
-        // data folder
-        const dataFolder = this.gui.addFolder('Data').open();
-        dataFolder.add(this.config, 'preset', this.presets).onChange((preset) => {
+        // settings
+        this.gui.add(this.config, 'preset', this.presets).name('Data').onChange((preset) => {
             setHash('preset', preset);
             window.location.reload();
         }).listen();
-        dataFolder.add(this.config, 'time', this.config._data.times.min, this.config._data.times.max, 1).onChange((v) => {
+        this.gui.add(this.config, 'time', this.config._data.times.min, this.config._data.times.max, 1).name('Time').onChange((v) => {
             this.place.update();
         }).listen();
 
-        // color folder
-        const colorFolder = this.gui.addFolder('Color').open();
-        colorFolder.addColor(this.config.color, 'canvas').onChange((v) => {
-            this.place.update();
-        }).listen();
-        colorFolder.addColor(this.config.color, 'background').onChange((v) => {
-            this.stage.renderer.setClearColor(v);
-            document.body.style.backgroundColor = hexColor(v);
-        }).listen();
-
-        // stage actions
+        // actions
         this.gui.add(this, 'export');
         this.gui.add(this, 'reset');
     }

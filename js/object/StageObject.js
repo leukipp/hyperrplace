@@ -45,8 +45,8 @@ class StageObject {
             this.stats = new Stats();
             this.root.querySelector('#info').append(this.stats.dom);
             this.root.querySelector('#stage').append(this.renderer.domElement);
-            this.renderer.setClearColor(this.config.color.background);
-            document.body.style.backgroundColor = hexColor(this.config.color.background);
+            this.renderer.setClearColor(this.config._color.background);
+            document.body.style.backgroundColor = hexColor(this.config._color.background);
 
             // reset stage
             this.reset();

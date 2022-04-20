@@ -11,9 +11,9 @@
             "max": 1649117640
         }
     },
-    "time": 1648817050,
-    "color": {
+    "_color": {
         "canvas": "0xffffff",
         "background": "0x2f2a46"
-    }
+    },
+    "time": 1648817050
 }

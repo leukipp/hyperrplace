@@ -58,10 +58,10 @@ const setConfig = async (config, update) => {
     }
 
     // update color values
-    for (key in config.color) {
-        const value = config.color[key];
+    for (key in config._color) {
+        const value = config._color[key];
         if (getType(value) === 'string') {
-            config.color[key] = parseInt(value, 16);
+            config._color[key] = parseInt(value, 16);
         }
     }
 
