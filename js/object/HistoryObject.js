@@ -21,7 +21,7 @@ class HistoryObject {
 
         // generate colors
         const colors = [];
-        for (let i = 0, l = 24 * 3; i < l; i += 3) {
+        for (let i = 0, l = this.geometry.attributes.position.count * 3; i < l; i += 3) {
             colors.push(color.r, color.g, color.b);
         }
 
@@ -37,7 +37,7 @@ class HistoryObject {
 
         // generate positions
         const positions = [];
-        for (let i = 0, l = 24 * 3; i < l; i += 3) {
+        for (let i = 0, l = this.geometry.attributes.position.count * 3; i < l; i += 3) {
             const point = this.origins.position.slice(i, i + 3);
             positions.push(point[0] + x, point[1] + y, point[2] + z);
         }
@@ -59,7 +59,7 @@ class HistoryObject {
         this.mergedGeometry = new THREE.BufferGeometry();
 
         // single geometry
-        this.geometry = new VoxelGeometry(this.config._color.canvas);
+        this.geometry = new VoxelGeometry(this.config._color.canvas, [0, 1, 2, 3, 4, 5]);
 
         // init origins
         this.origins = {
