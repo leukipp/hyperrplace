@@ -6,7 +6,7 @@ class VoxelGeometry extends THREE.BufferGeometry {
         this.type = 'VoxelGeometry';
 
         // parameters
-        color = new THREE.Color(color || 0xffffff);
+        color = rgbColor(color || 0xffffff);
         planes = planes || [0, 1, 2, 3, 4, 5];
 
         // dimensions
@@ -39,10 +39,10 @@ class VoxelGeometry extends THREE.BufferGeometry {
 
         // build geometry
         this.setIndex(indices);
-        this.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        this.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        this.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-        this.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        this.setAttribute('color', new THREE.Uint8BufferAttribute(colors, 3, true));
+        this.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3, false));
+        this.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3, false));
+        this.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2, false));
 
         function buildPlane(u, v, w, udir, vdir, width, height, depth, gridX, gridY, planeIndex) {
             if (planes.indexOf(planeIndex) < 0) {
@@ -98,12 +98,7 @@ class VoxelGeometry extends THREE.BufferGeometry {
                 }
             }
 
-            // indices
-
-            // 1. you need three indices to draw a single face
-            // 2. a single segment consists of two faces
-            // 3. so we need to generate six (2*3) indices per segment
-
+            // generate indices
             for (let iy = 0; iy < gridY; iy++) {
                 for (let ix = 0; ix < gridX; ix++) {
                     const a = numberOfVertices + ix + gridX1 * iy;

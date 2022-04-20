@@ -68,6 +68,14 @@ const intColor = (color) => {
     return parseInt(color);
 };
 
+const rgbColor = (color) => {
+    return {
+        r: (color & 0xff0000) >> 16,
+        g: (color & 0x00ff00) >> 8,
+        b: (color & 0x0000ff)
+    };
+};
+
 const setProperty = (object, path, value) => {
     if (path.length === 1) {
         object[path[0]] = value;

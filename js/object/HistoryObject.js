@@ -33,7 +33,7 @@ class HistoryObject {
         // calculate position (data origin is at top-left corner)
         const x = position.x + this.origins.offset.x;
         const y = -position.y - this.origins.offset.y;
-        const z = this.origins.offset.z;
+        const z = position.z + this.origins.offset.z;
 
         // generate positions
         const positions = [];
@@ -86,7 +86,8 @@ class HistoryObject {
         for (let i = 0, l = this.size; i < l; i++) {
             const position = {
                 x: i % this.config._canvas.width,
-                y: (i - i % this.config._canvas.width) / this.config._canvas.width
+                y: (i - i % this.config._canvas.width) / this.config._canvas.width,
+                z: 0
             };
 
             // merge attributes
@@ -100,7 +101,7 @@ class HistoryObject {
             }
             this.mergedIndex.offset += this.geometry.attributes.position.count;
 
-            // release thread
+            // release
             if (i % 100000 == 0) {
                 await sleep();
             }
@@ -117,7 +118,8 @@ class HistoryObject {
 
     async mergeAttributes(name) {
         const attributes = this.mergedAttributes[name];
-        const array = new Float32Array(attributes[0].length * attributes.length);
+        const Array = name === 'color' ? Uint8Array : Float32Array;
+        const array = new Array(attributes[0].length * attributes.length);
 
         // merge geometry attributes
         let offset = 0;
@@ -125,13 +127,13 @@ class HistoryObject {
             array.set(attributes[i], offset);
             offset += attributes[i].length;
 
-            // release thread
+            // release
             if (i % 100000 == 0) {
                 await sleep();
             }
         }
 
-        return new THREE.BufferAttribute(array, 3);
+        return new THREE.BufferAttribute(array, 3, name === 'color');
     }
 
     async update() {
