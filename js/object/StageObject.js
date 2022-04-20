@@ -159,7 +159,7 @@ class StageObject {
 
         // export image
         const image = canvasImage(this.renderer.domElement);
-        stage.file('image.png', image, { base64: true });
+        stage.file('screenshot.png', image, { base64: true });
     }
 
     async reset() {
